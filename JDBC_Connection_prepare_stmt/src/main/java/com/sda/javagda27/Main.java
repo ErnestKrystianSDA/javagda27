@@ -21,27 +21,30 @@ public class Main {
 		Connection connection;
 		Scanner sc = new Scanner(System.in);
 		List<Faktury> faktury = new ArrayList<>();
-		System.out.println("Podaj kwotê wieksz¹: ");
-		double kwotaWieksza = sc.nextDouble();
-		sc.nextLine();
+//		System.out.println("Podaj kwotê wieksz¹: ");
+//		double kwotaWieksza = sc.nextDouble();
+//		sc.nextLine();
 		
-		System.out.println("Podaj kwotê mniejsza: ");
-		double kwotaMniejsza = sc.nextDouble();
+		System.out.println("Podaj id kienta: ");
+		int idKlienta = sc.nextInt();
 		sc.nextLine();
 
 		try {
 			connection = DriverManager.getConnection(url, user, password);
-			String prepateString = "select * from faktury where kwota < ? and kwota > ?";
+			String prepateString = "select * from faktury where id_klienta = ?";
 			PreparedStatement preparedStatement = connection.prepareStatement(prepateString);
-			preparedStatement.setDouble(1, kwotaWieksza);
-			preparedStatement.setDouble(2, kwotaMniejsza);
+			preparedStatement.setInt(1, idKlienta);
 			
 			ResultSet result = preparedStatement.executeQuery();
-			
+			int sum = 0;
 			while(result.next()) {
-				System.out.println("Kwota: " + result.getInt(2));
+				if(result.getInt("oplacona") == 0) {
+					sum += result.getInt(2);
+				}
+				System.out.println("Nr faktury: " + result.getString(1) +  " Kwota: " + result.getInt(2));
 			}
 
+			System.out.println("Suma dla faktur: " + sum);
 			connection.close();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
